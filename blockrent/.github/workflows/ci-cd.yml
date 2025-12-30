@@ -1,0 +1,163 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  # Backend tests
+  backend-test:
+    runs-on: ubuntu-latest
+    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: test_password
+          MYSQL_DATABASE: blockrent_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: backend/package-lock.json
+    
+    - name: Install dependencies
+      working-directory: ./backend
+      run: npm ci
+    
+    - name: Run tests
+      working-directory: ./backend
+      env:
+        DB_HOST: localhost
+        DB_USER: root
+        DB_PASSWORD: test_password
+        DB_NAME: blockrent_test
+        JWT_SECRET: test_jwt_secret_32_chars_long_minimum
+        SESSION_SECRET: test_session_secret_32_chars
+        NODE_ENV: test
+      run: npm test
+    
+    - name: Upload coverage
+      uses: codecov/codecov-action@v3
+      if: success()
+      with:
+        files: ./backend/coverage/lcov.info
+        flags: backend
+
+  # Frontend tests
+  frontend-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+    
+    - name: Install dependencies
+      working-directory: ./frontend
+      run: npm ci
+    
+    - name: Run tests
+      working-directory: ./frontend
+      env:
+        CI: true
+      run: npm test -- --coverage --watchAll=false
+    
+    - name: Upload coverage
+      uses: codecov/codecov-action@v3
+      if: success()
+      with:
+        files: ./frontend/coverage/lcov.info
+        flags: frontend
+
+  # Smart contract tests
+  contracts-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: contracts/package-lock.json
+    
+    - name: Install dependencies
+      working-directory: ./contracts
+      run: npm ci
+    
+    - name: Run tests
+      working-directory: ./contracts
+      run: npm test
+    
+    - name: Check contract size
+      working-directory: ./contracts
+      run: npx hardhat size-contracts
+
+  # Code quality checks
+  code-quality:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    
+    - name: Install dependencies (Backend)
+      working-directory: ./backend
+      run: npm ci
+    
+    - name: Install dependencies (Frontend)
+      working-directory: ./frontend
+      run: npm ci
+    
+    - name: Run ESLint (Backend)
+      working-directory: ./backend
+      run: npm run lint || true
+    
+    - name: Run ESLint (Frontend)
+      working-directory: ./frontend
+      run: npm run lint || true
+
+  # Security audit
+  security-audit:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Run npm audit (Backend)
+      working-directory: ./backend
+      run: npm audit --audit-level=moderate || true
+    
+    - name: Run npm audit (Frontend)
+      working-directory: ./frontend
+      run: npm audit --audit-level=moderate || true
+    
+    - name: Run npm audit (Contracts)
+      working-directory: ./contracts
+      run: npm audit --audit-level=moderate || true

@@ -1,0 +1,13 @@
+console.log("Contract paused:", paused);
+log
+console.
+const paused = await contract.isPaused();
+await contract.unpause();
+const contract = await ethers.getContractAt("Blockrent", "0x73511669fd4dE447feD18BB79bAFeAC93aB7F31f");
+await contract.unpause();
+const contract = await ethers.getContractAt("Blockrent", "0x73511669fd4dE447feD18BB79bAFeAC93aB7F31f");
+");
+;
+const contract = await ethers.getContractAt("Block
+await contract.unpause();
+const contract = await ethers.getContractAt("Block");

@@ -1,0 +1,47 @@
+{
+  "name": "blockrent",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Decentralized marketplace for buying, selling, and renting items",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "setup": "node scripts/setup.js",
+    "setup-env": "node scripts/auto-env-setup.js",
+    "check-security": "node scripts/check-security.js",
+    "precommit": "npm run check-security",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "dev": "concurrently \"cd contracts && npx hardhat node\" \"cd frontend && npm start\"",
+    "deploy": "cd contracts && npx hardhat run scripts/deploy.js --network localhost",
+    "deploy-mumbai": "cd contracts && npx hardhat run scripts/deploy.js --network mumbai",
+    "install-all": "cd contracts && npm install && cd ../backend && npm install && cd ../frontend && npm install",
+    "build": "cd frontend && npm run build",
+    "start-backend": "cd backend && npm start",
+    "start-frontend": "cd frontend && npm start"
+  },
+  "keywords": [
+    "blockchain",
+    "marketplace",
+    "ethereum",
+    "solidity"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.28.5",
+    "@babel/eslint-parser": "^7.28.5",
+    "@babel/preset-react": "^7.28.5",
+    "@eslint/js": "^9.39.1",
+    "concurrently": "^8.2.0",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "globals": "^16.5.0",
+    "prettier": "^3.7.4"
+  }
+}
