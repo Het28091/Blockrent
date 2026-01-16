@@ -77,10 +77,14 @@ function App() {
                     <Route path="/signin" element={<AuthPage />} />
                     <Route path="/signup" element={<AuthPage />} />
 
-                    {/* Marketplace - Public */}
+                    {/* Marketplace - Protected */}
                     <Route
                       path="/marketplace"
-                      element={<Marketplace />}
+                      element={
+                        <AuthGuard requireAuth={true}>
+                          <Marketplace />
+                        </AuthGuard>
+                      }
                     />
 
                     {/* Auth Required Routes */}

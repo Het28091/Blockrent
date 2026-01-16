@@ -99,7 +99,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('walletAddress');
   };
 
-  const login = async (walletAddress = account) => {
+  const login = async (walletAddress = account, explicitProvider = null) => {
     const providedWallet =
       typeof walletAddress === 'string' ? walletAddress.trim() : '';
 
@@ -130,7 +130,7 @@ export const AuthProvider = ({ children }) => {
 
       let signature;
       try {
-        signature = await signMessage(message, normalizedWallet);
+        signature = await signMessage(message, normalizedWallet, explicitProvider);
       } catch (signError) {
         if (signError.message?.includes('rejected')) {
           throw new Error('User rejected signature request');
@@ -196,8 +196,8 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const signMessage = async (message, expectedWallet = account) => {
-    let activeProvider = provider;
+  const signMessage = async (message, expectedWallet = account, explicitProvider = null) => {
+    let activeProvider = explicitProvider || provider;
 
     if (!activeProvider && window.ethereum) {
       activeProvider = new ethers.providers.Web3Provider(window.ethereum);

@@ -344,10 +344,13 @@ router.get('/:walletAddress/purchases', async (req, res) => {
             : null,
         };
       } catch (parseError) {
-        logger.error('Error parsing purchase data', {
-          error: parseError.message,
-          purchaseId: purchase.id,
-        });
+        // Log only if it's not a common empty/null issue to avoid flooding
+        if (purchase.images && purchase.images !== '[]') {
+             logger.warn('Error parsing purchase data', {
+              error: parseError.message,
+              purchaseId: purchase.id,
+            });
+        }
         return {
           ...purchase,
           images: [],

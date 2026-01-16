@@ -83,7 +83,7 @@ const SignUpPage = () => {
     setIsLoading(true);
 
     try {
-      const connected = await connectWallet();
+      const { account: connected } = await connectWallet();
       if (!connected) {
         throw new Error('Failed to connect wallet. Please try again.');
       }

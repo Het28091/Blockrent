@@ -111,10 +111,12 @@ const Navbar = () => {
 
       // Step 1: Connect wallet if not connected
       let currentAccount = account;
+      let currentProvider = null;
       if (!isConnected) {
         try {
-          const connectedAccount = await connectWallet();
+          const { account: connectedAccount, provider: connectedProvider } = await connectWallet();
           currentAccount = connectedAccount;
+          currentProvider = connectedProvider;
 
           // Wait for provider to be fully set
           await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -141,7 +143,7 @@ const Navbar = () => {
 
       // Step 3: Sign in with wallet (this will prompt signature)
       try {
-        await login(currentAccount);
+        await login(currentAccount, currentProvider);
       } catch (loginError) {
         // Check if user rejected the signature
         if (

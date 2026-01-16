@@ -39,6 +39,7 @@ export const Web3Provider = ({ children }) => {
     const newWeb3Modal = new Web3Modal({
       cacheProvider: true, // optional
       providerOptions, // required
+      disableInjectedProvider: false, // Ensure injected providers (MetaMask) are enabled
       theme: 'dark',
     });
 
@@ -137,7 +138,7 @@ export const Web3Provider = ({ children }) => {
         disconnect();
       });
 
-      return accounts[0];
+      return { account: accounts[0], provider: web3Provider };
     } finally {
       setIsConnecting(false);
     }
